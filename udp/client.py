@@ -3,11 +3,13 @@ import threading
 import os
 import datetime
 
+#Configurações do cliente
 IP_Servidor = '127.0.0.1'
 PORTA_Servidor = 5000
 BUFFER_SIZE = 1024
 
 def receber_mensagens(udp):
+    #Escuta mensagens enviadas pelo servidor e as imprime na tela.
     while True:
         try:
             mensagem, _ = udp.recvfrom(BUFFER_SIZE)
@@ -15,7 +17,9 @@ def receber_mensagens(udp):
         except:
             break
 
+
 def enviar_arquivo(udp, caminho_arquivo):
+    #Lê e envia um arquivo em fragmentos para o servidor.
     try:
         with open(caminho_arquivo, 'r') as arquivo:
             conteudo = arquivo.read()
@@ -29,7 +33,9 @@ def enviar_arquivo(udp, caminho_arquivo):
     except Exception as e:
         print(f"Erro ao enviar arquivo: {e}")
 
+
 def salvar_mensagem_como_arquivo(mensagem):
+    #Salva a mensagem como um arquivo de texto.
     try:
         nome_arquivo = f"mensagem_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
         with open(nome_arquivo, 'w') as arquivo:
@@ -38,6 +44,7 @@ def salvar_mensagem_como_arquivo(mensagem):
     except Exception as e:
         print(f"Erro ao salvar mensagem como arquivo: {e}")
         return None
+
 
 try:
     udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

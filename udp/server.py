@@ -7,6 +7,7 @@ MEU_IP = ''
 MINHA_PORTA = 5000
 BUFFER_SIZE = 1024
 
+#criação do socket
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.bind((MEU_IP, MINHA_PORTA))
 
@@ -15,6 +16,8 @@ print("Servidor rodando e aguardando mensagens...")
 clientes = {}
 file_fragments = defaultdict(dict)  #{file_id: {num: data}}
 
+
+#função para processar arquivo
 def processar_arquivo(mensagem, addr):
     try:
         header, content = mensagem.split('|', 1)
@@ -40,6 +43,8 @@ def processar_arquivo(mensagem, addr):
     except Exception as e:
         print(f"Erro ao processar arquivo: {e}")
 
+
+#função para salvar arquivo
 def salvar_mensagem_como_arquivo(mensagem, addr):
     try:
         nome_arquivo = f"mensagem_{addr[0]}_{addr[1]}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
@@ -50,6 +55,8 @@ def salvar_mensagem_como_arquivo(mensagem, addr):
         print(f"Erro ao salvar mensagem como arquivo: {e}")
         return None
 
+
+#loop para receber mensagens e processá-las, até que o servidor seja encerrado
 try:
     while True:
         Mensagem_Recebida, END_client = udp.recvfrom(BUFFER_SIZE)
