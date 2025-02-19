@@ -7,17 +7,17 @@ MEU_IP = ''
 MINHA_PORTA = 5000
 BUFFER_SIZE = 1024
 
-#criação do socket
+# criação do socket
 udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 udp.bind((MEU_IP, MINHA_PORTA))
 
 print("Servidor rodando e aguardando mensagens...")
 
 clientes = {}
-file_fragments = defaultdict(dict)  #{file_id: {num: data}}
+file_fragments = defaultdict(lambda: defaultdict(str))  # {file_id: {num: data}}
+file_fragment_count = {}  # {file_id: total_fragments}
 
-
-#função para processar arquivo
+# Função para processar fragmentos de arquivos
 def processar_arquivo(mensagem, addr):
     try:
         header, content = mensagem.split('|', 1)
@@ -25,26 +25,32 @@ def processar_arquivo(mensagem, addr):
         num = int(num)
         total = int(total)
         
-        #armazenamento fragmento
+        # Armazenamento do fragmento
         file_fragments[file_id][num] = content
+        file_fragment_count[file_id] = total
         
-        #vai verificar se todos os fragmentos foram recebidos
+        # Verifica se todos os fragmentos foram recebidos
         if len(file_fragments[file_id]) == total:
-            #reconstruir arquivo
-            full_content = ''.join([file_fragments[file_id][i] for i in range(total)])
+            # Reconstruir o arquivo
+            full_content = ''.join(file_fragments[file_id][i] for i in range(total))
             
-            #vai fazer a formatação da mensagem
+            # Formatar a mensagem
             nome_usuario = clientes[addr]
             hora_data = datetime.datetime.now().strftime("%H:%M:%S %d/%m/%Y")
             mensagem_formatada = f"{addr[0]}:{addr[1]}/~{nome_usuario}: {full_content} {hora_data}"
             print(mensagem_formatada)
+            
+            # Enviar para todos os clientes
             for cliente in clientes:
                 udp.sendto(mensagem_formatada.encode("utf8"), cliente)
+            
+            # Remover fragmentos após reconstrução
+            del file_fragments[file_id]
+            del file_fragment_count[file_id]
     except Exception as e:
         print(f"Erro ao processar arquivo: {e}")
 
-
-#função para salvar arquivo
+# Função para salvar arquivo
 def salvar_mensagem_como_arquivo(mensagem, addr):
     try:
         nome_arquivo = f"mensagem_{addr[0]}_{addr[1]}_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.txt"
@@ -55,8 +61,7 @@ def salvar_mensagem_como_arquivo(mensagem, addr):
         print(f"Erro ao salvar mensagem como arquivo: {e}")
         return None
 
-
-#loop para receber mensagens e processá-las, até que o servidor seja encerrado
+# Loop principal para receber mensagens e processá-las
 try:
     while True:
         Mensagem_Recebida, END_client = udp.recvfrom(BUFFER_SIZE)
@@ -67,7 +72,8 @@ try:
             clientes[END_client] = nome_usuario
             print(f"{END_client[0]}:{END_client[1]}/~{nome_usuario} entrou na sala.")
             udp.sendto(f"hi, meu nome eh {nome_usuario}!".encode("utf8"), END_client)
-            #noticação de um novo usuário
+            
+            # Notificação de um novo usuário
             for cliente in clientes:
                 if cliente != END_client:
                     udp.sendto(f"{END_client[0]}:{END_client[1]}/~{nome_usuario} entrou na sala.".encode("utf8"), cliente)
@@ -76,7 +82,8 @@ try:
                 nome_usuario = clientes.pop(END_client)
                 print(f"{END_client[0]}:{END_client[1]}/~{nome_usuario} saiu da sala.")
                 udp.sendto("Você saiu do chat.".encode("utf8"), END_client)
-                #notificação
+                
+                # Notificação
                 for cliente in clientes:
                     udp.sendto(f"{END_client[0]}:{END_client[1]}/~{nome_usuario} saiu da sala.".encode("utf8"), cliente)
             else:
