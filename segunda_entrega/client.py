@@ -36,25 +36,46 @@ def receber_mensagens(udp):
         except:
             break
 
+def fragmentar_mensagem(mensagem, max_size=900):
+    # Fragmenta a mensagem em partes menores de até 1024 bytes
+    fragmentos = []
+    while len(mensagem) > max_size:
+        fragmentos.append(mensagem[:max_size])
+        mensagem = mensagem[max_size:]
+    if mensagem:
+        fragmentos.append(mensagem)
+    return fragmentos
+
 def enviar_mensagem_confiavel(udp, mensagem):
     global seq_num, ack_recebido
 
-    checksum = calcular_checksum(mensagem)
-    pacote = f"RDT|{seq_num}|{checksum}|{mensagem}"
+    fragmentos = fragmentar_mensagem(mensagem)
 
-    while True:
-        udp.sendto(pacote.encode("utf8"), (IP_Servidor, PORTA_Servidor))
-        print(f"[CLIENTE] Pacote enviado com seq={seq_num}, aguardando ACK...")
+    # Variável para armazenar os fragmentos recebidos e reconstruir a mensagem
+    fragmentos_recebidos = []
 
-        ack_recebido.clear()
-        ack_recebido.wait(timeout=TIMEOUT)
+    for fragmento in fragmentos:
+        checksum = calcular_checksum(fragmento)
+        pacote = f"RDT|{seq_num}|{checksum}|{fragmento}"
 
-        if ack_recebido.is_set():
-            seq_num = 1 - seq_num  # alterna entre 0 e 1
-            salvar_mensagem_como_arquivo(f"{nome_usuario}: {mensagem}")
-            break
-        else:
-            print(f"[CLIENTE] Timeout! Reenviando pacote seq={seq_num}...")
+        while True:
+            udp.sendto(pacote.encode("utf8"), (IP_Servidor, PORTA_Servidor))
+            print(f"[CLIENTE] Pacote enviado com seq={seq_num}, aguardando ACK...")
+
+            ack_recebido.clear()
+            ack_recebido.wait(timeout=TIMEOUT)
+
+            if ack_recebido.is_set():
+                seq_num = 1 - seq_num  # alterna entre 0 e 1
+                fragmentos_recebidos.append(fragmento)  # Adiciona o fragmento à lista de fragmentos recebidos
+                salvar_mensagem_como_arquivo(f"{nome_usuario}: {fragmento}")
+                break
+            else:
+                print(f"[CLIENTE] Timeout! Reenviando pacote seq={seq_num}...")
+
+    # Após enviar todos os fragmentos, reconstrua a mensagem completa
+    mensagem_reconstruida = ''.join(fragmentos_recebidos)
+    salvar_mensagem_como_arquivo(f"Mensagem completa recebida: {mensagem_reconstruida}")
 
 def enviar_arquivo(udp, caminho_arquivo):
     # Lê e envia um arquivo em fragmentos para o servidor.

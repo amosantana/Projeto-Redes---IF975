@@ -21,6 +21,17 @@ seq_esperado = {}
 def calcular_checksum(mensagem):
     return zlib.crc32(mensagem.encode("utf8"))
 
+def fragmentar_mensagem(mensagem, max_size=100):
+    """Fragmenta a mensagem em pacotes menores com número de sequência."""
+    fragments = []
+    total_fragments = (len(mensagem) // max_size) + (1 if len(mensagem) % max_size > 0 else 0)
+    
+    for i in range(total_fragments):
+        fragment = mensagem[i * max_size:(i + 1) * max_size]
+        fragments.append((i, total_fragments, fragment))  # (número de sequência, total de fragmentos, fragmento)
+    
+    return fragments
+
 def processar_arquivo(mensagem, addr):
     try:
         header, content = mensagem.split('|', 1)
@@ -116,13 +127,12 @@ try:
                 seq_esperado[END_client] = 1 - seq
 
             else:
-                if END_client in clientes:
-                    nome_usuario = clientes[END_client]
-                    hora_data = datetime.datetime.now().strftime("%H:%M:%S %d/%m/%Y")
-                    mensagem_formatada = f"{END_client[0]}:{END_client[1]}/~{nome_usuario}: {mensagem} {hora_data}"
-                    print(mensagem_formatada)
-                    for cliente in clientes:
-                        udp.sendto(mensagem_formatada.encode("utf8"), cliente)
+                # Fragmentando a mensagem antes de enviar
+                fragments = fragmentar_mensagem(mensagem)
+
+                for seq, total, fragment in fragments:
+                    checksum = calcular_checksum(fragment)
+                    udp.sendto(f"RDT|{seq}|{checksum}|{fragment}".encode("utf8"), END_client)
 
         except ConnectionResetError:
             print("Conexão foi interrompida por um cliente. Continuando a execução do servidor...")
