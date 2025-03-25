@@ -1,9 +1,11 @@
 # <p align="center">Projeto-Redes-IF975 </p>
 
-Repositório para o projeto da disciplina IF975 sobre redes de computadores.
-Documentação do Cliente e Servidor UDP
+<a name="readme-top"></a>
+# <p align="center">Chat de sala única com UDP e RDT3.0</p>
 
-## 1) Membros da `Equipe 1`:
+Este projeto tem como objetivo a implementação de um sistema de chat com transferência confiável utilizando o protocolo RDT 3.0 sobre UDP, garantindo entrega ordenada e sem erros mesmo em condições de rede instável, aplicando conceitos vistos em sala de aula sobre os conceitos da disciplina IF975- Redes de computadores
+
+## 1) Membros da `Equipe 1` 👥:
 <br>
 
 
@@ -12,21 +14,12 @@ Documentação do Cliente e Servidor UDP
 - [Saunay Coutinho (svsc)](https://github.com/saunayc)
 
 
-<br>
-
-
 ## 2) Link para repositório git
   
    https://github.com/amosantana/Projeto-Redes---IF975
 
-<br>
 
-
-## 3) Introdução
-
-Este documento descreve o funcionamento do cliente e servidor UDP para comunicação em rede, utilizando a biblioteca socket em Python. O sistema permite a troca de mensagens de texto e o envio de arquivos de texto entre múltiplos clientes conectados ao servidor.
-
-## 4) Requisitos
+## 3) Requisitos
 
 Python 3.x
 
@@ -36,89 +29,39 @@ Biblioteca threading (padrão do Python)
 
 Biblioteca collections (padrão do Python)
 
+Biblioteca zlib (compactação de arquivos)
+
 Permissão de acesso a arquivos no sistema
 
 Estrutura do Cliente (client.py)
 
-## 5) Configuração Inicial
+## 4) Instruções
 
-IP_Servidor = '127.0.0.1'
-PORTA_Servidor = 5000
-BUFFER_SIZE = 1024
+---
+Separado por pastas, pode ser acessado o código referente as respectivas etapas do projeto, com um passo a passo e requisitos especificos para o funcionamento adequado do progama.
+---
 
-Define o endereço IP do servidor, a porta utilizada e o tamanho do buffer para transmissão de dados.
+## Integrantes
 
-## 5.1) Funções
-
-### receber_mensagens(udp)
-
-Inicia uma thread que escuta mensagens recebidas do servidor e as imprime na tela.
-
-### enviar_arquivo(udp, caminho_arquivo)
-
-Lê um arquivo do sistema de arquivos e o envia fragmentado para o servidor, incluindo metadados como ID do arquivo e sequência de pacotes.
-
-### salvar_mensagem_como_arquivo(mensagem)
-
-Salva mensagens de chat como arquivos de texto com um timestamp no nome do arquivo.
-
-### Conexão ao Servidor
-
-O cliente inicia um socket UDP e envia uma mensagem de saudação com o nome do usuário.
-
-### Loop de Entrada
-
-O programa entra em um loop onde o usuário pode:
-
-Digitar mensagens comuns
-
-Enviar arquivos usando FILE <caminho_do_arquivo>
-
-Digitar bye para encerrar a conexão
-
-### Encerramento
-
-Ao sair, o cliente fecha o socket UDP e exibe uma mensagem de encerramento.
-
-## 6) Estrutura do Servidor (server.py)
-
-### Configuração Inicial
-
-MEU_IP = ''
-MINHA_PORTA = 5000
-BUFFER_SIZE = 1024
-
-Define a porta do servidor e o buffer de transmissão.
-
-### Gerenciamento de Clientes e Arquivos
-
-O servidor armazena clientes conectados e fragmentos de arquivos recebidos:
-
-clientes = {}
-file_fragments = defaultdict(dict)
-
-## 6.1) Funções
-
-## processar_arquivo(mensagem, addr)
-
-Processa arquivos recebidos fragmentados, reconstroi-os e retransmite aos clientes conectados.
-
-## salvar_mensagem_como_arquivo(mensagem, addr)
-
-Salva mensagens recebidas em arquivos de texto com timestamp e endereço IP do remetente.
-
-## Loop Principal
-
-O servidor:
-
-Aguarda conexões de clientes
-
-Registra e notifica novas conexões
-
-Gerencia saídas de clientes
-
-Encaminha mensagens e arquivos para todos os clientes conectados
-
-## 7) Encerramento
-
-Quando o servidor é encerrado, após o recebimento da mensagem 'bye' o socket UDP é fechado de forma segura.
+<table align="center">
+  <tr>
+    <td align="center">
+      <a href="https://github.com/amosantana">
+        <img src="https://avatars.githubusercontent.com/u/157263012?v=4" width="200px;" border-radius="50%;" alt="Foto do Integrante"/><br>
+        <sub><b>Amós Santana</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Monkius-Maximus">
+        <img src="https://avatars.githubusercontent.com/u/149613054?v=4" width="200px;" border-radius="50%;" alt="Foto do Integrante"/><br>
+        <sub><b>Diogo Rodrigues</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/saunayc">
+        <img src="https://avatars.githubusercontent.com/u/90536225?v=4" width="200px;" border-radius="50%;" alt="Foto do Integrante"/><br>
+        <sub><b>Saunay Coutinho</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
