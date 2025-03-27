@@ -40,11 +40,11 @@ Estrutura do Cliente (client.py)
 
 ```
 chat-rdt3/
-├── client.py            # Cliente do chat
-├── server.py            # Servidor central
-├── mensagens_txt/       # Histórico de mensagens
-├── requirements.txt     # Dependências
-└── README.md            # Documentação
+├── client.py            #Cliente do chat
+├── server.py            #Servidor central
+├── mensagens_txt/       #Histórico de mensagens
+├── requirements.txt     #Dependências
+└── README.md            #Documentação
 ```
 
 ## 🚀 Como Executar
@@ -64,6 +64,14 @@ python server.py
 ```bash
 python client.py
 ```
+## 🔧 Funcionamento do Protocolo
+
+O protocolo RDT 3.0 foi implementado para garantir a entrega confiável de mensagens e arquivos. As principais etapas incluem:
+
+- **Envio de pacotes**: O cliente fragmenta mensagens grandes e envia pacotes com número de sequência e checksum.
+- **Recebimento de pacotes**: O servidor valida o checksum e o número de sequência antes de processar o pacote.
+- **ACKs e retransmissões**: O cliente aguarda um ACK do servidor para cada pacote enviado. Em caso de timeout ou ACK incorreto, o pacote é retransmitido.
+- **Logs detalhados**: Tanto o cliente quanto o servidor exibem logs detalhados no console para acompanhar as etapas do protocolo, incluindo envio, recebimento, validação de checksum e retransmissões.
 
 ## 🔧 Funcionamento do Protocolo
 
@@ -78,6 +86,7 @@ Implementa o cliente do chat, responsável por enviar e receber mensagens usando
 - **Recebimento de mensagens**: Escuta mensagens do servidor e as exibe.
 - **Envio de arquivos**: Permite o envio de arquivos fragmentados.
 - **Salvamento de mensagens**: Salva mensagens recebidas em arquivos locais.
+- **Logs detalhados**: Exibe logs no console para acompanhar o envio e recebimento de pacotes.
 
 #### Métodos Principais:
 - `receber_mensagens(udp)`: Escuta mensagens do servidor e trata ACKs.
@@ -100,6 +109,7 @@ Implementa o servidor do chat, responsável por gerenciar conexões e retransmit
 - **Processamento de mensagens**: Recebe mensagens dos clientes e as retransmite.
 - **Fragmentação de mensagens**: Divide mensagens grandes em pacotes menores.
 - **Processamento de arquivos**: Reconstroi arquivos enviados fragmentados.
+- **Logs detalhados**: Exibe logs no console para acompanhar o recebimento e processamento de pacotes.
 
 #### Métodos Principais:
 - `processar_arquivo(mensagem, addr)`: Reconstroi arquivos a partir de fragmentos.
@@ -113,6 +123,22 @@ Implementa o servidor do chat, responsável por gerenciar conexões e retransmit
 
 ---
 
+### 📜 Logs de Execução
+
+Os logs detalhados ajudam a entender o funcionamento do protocolo RDT 3.0. Exemplos de logs exibidos:
+
+- **Cliente**:
+  - `[CLIENTE] Enviando pacote seq=0, checksum=123456, fragmento='Olá'`
+  - `[CLIENTE] ACK recebido para seq=0. Alternando número de sequência.`
+  - `[CLIENTE] Timeout! Reenviando pacote seq=0...`
+
+- **Servidor**:
+  - `[SERVIDOR] Pacote recebido de ('127.0.0.1', 5000), seq=0, checksum=123456, conteúdo='Olá'`
+  - `[SERVIDOR] Checksum válido. Processando conteúdo.`
+  - `[SERVIDOR] Enviando ACK para seq=0.`
+
+---
+
 ### Formato dos Pacotes
 ```python
 # Mensagem:
@@ -121,6 +147,7 @@ f"RDT|{seq_num}|{checksum}|{mensagem}"
 # ACK:
 f"ACK|{seq_num}|{checksum_ack}"
 
+---
 
 ## 📌 Recursos Implementados
 
@@ -128,8 +155,11 @@ f"ACK|{seq_num}|{checksum_ack}"
 ✔️ **Controle de fluxo** com números de sequência de 1 bit  
 ✔️ **Detecção de erros** via checksum CRC32  
 ✔️ **Retransmissão** após timeout  
-✔️ **Tratamento de ACKs** duplicados e corrompidos  
-✔️ **Simulação de erros** para demonstração  
+✔️ **Tratamento de ACKs** duplicados e corrompidos
+✔️ **Logs detalhados** para depuração e acompanhamento do protocolo    
+✔️ **Simulação de erros** para demonstração
+
+---
 
 ## Integrantes
 
