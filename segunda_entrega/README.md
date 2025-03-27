@@ -147,6 +147,7 @@ f"RDT|{seq_num}|{checksum}|{mensagem}"
 # ACK:
 f"ACK|{seq_num}|{checksum_ack}"
 
+---
 
 ## 📌 Recursos Implementados
 
@@ -156,7 +157,9 @@ f"ACK|{seq_num}|{checksum_ack}"
 ✔️ **Retransmissão** após timeout  
 ✔️ **Tratamento de ACKs** duplicados e corrompidos
 ✔️ **Logs detalhados** para depuração e acompanhamento do protocolo    
-✔️ **Simulação de erros** para demonstração  
+✔️ **Simulação de erros** para demonstração
+
+---
 
 ## Integrantes
 
