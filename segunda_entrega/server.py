@@ -94,16 +94,17 @@ try:
             elif mensagem.startswith("RDT|"):
                 partes = mensagem.split('|', 3)
                 if len(partes) < 4:
+                    print("[SERVIDOR] Pacote malformado recebido. Ignorando.")
                     continue
                 _, seq, checksum_recebido, conteudo = partes
                 seq = int(seq)
                 checksum_recebido = int(checksum_recebido)
                 checksum_calculado = calcular_checksum(conteudo)
 
-                print(f"[SERVIDOR] Pacote recebido de {END_client}, seq={seq}, checksum={checksum_recebido}")
+                print(f"[SERVIDOR] Pacote recebido de {END_client}, seq={seq}, checksum={checksum_recebido}, conteúdo='{conteudo[:20]}...'")
 
                 if checksum_recebido != checksum_calculado:
-                    print(f"[SERVIDOR] Checksum incorreto! Enviando ACK duplicado para seq={1 - seq}")
+                    print(f"[SERVIDOR] Checksum incorreto! Esperado={checksum_calculado}, recebido={checksum_recebido}. Enviando ACK duplicado para seq={1 - seq}.")
                     udp.sendto(f"ACK|{1 - seq}".encode("utf8"), END_client)
                     continue
 
@@ -111,19 +112,21 @@ try:
                     seq_esperado[END_client] = 0
 
                 if seq != seq_esperado[END_client]:
-                    print(f"[SERVIDOR] Seq diferente do esperado! Ignorando duplicado. Enviando ACK para seq={1 - seq}")
+                    print(f"[SERVIDOR] Seq diferente do esperado! Esperado={seq_esperado[END_client]}, recebido={seq}. Ignorando duplicado. Enviando ACK para seq={1 - seq}.")
                     udp.sendto(f"ACK|{1 - seq}".encode("utf8"), END_client)
                     continue
 
+                print(f"[SERVIDOR] Pacote válido recebido. Processando conteúdo e enviando ACK para seq={seq}.")
                 nome_usuario = clientes[END_client]
                 hora_data = datetime.datetime.now().strftime("%H:%M:%S %d/%m/%Y")
                 mensagem_formatada = f"{END_client[0]}:{END_client[1]}/~{nome_usuario}: {conteudo} {hora_data}"
-                print(mensagem_formatada)
+                print(f"[SERVIDOR] Mensagem formatada: {mensagem_formatada}")
 
                 for cliente in clientes:
                     udp.sendto(mensagem_formatada.encode("utf8"), cliente)
 
                 udp.sendto(f"ACK|{seq}".encode("utf8"), END_client)
+                print(f"[SERVIDOR] ACK enviado para seq={seq}.")
                 seq_esperado[END_client] = 1 - seq
 
             else:

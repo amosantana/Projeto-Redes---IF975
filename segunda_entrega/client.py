@@ -59,13 +59,14 @@ def enviar_mensagem_confiavel(udp, mensagem):
         pacote = f"RDT|{seq_num}|{checksum}|{fragmento}"
 
         while True:
+            print(f"[CLIENTE] Enviando pacote seq={seq_num}, checksum={checksum}, fragmento='{fragmento[:20]}...'")
             udp.sendto(pacote.encode("utf8"), (IP_Servidor, PORTA_Servidor))
-            print(f"[CLIENTE] Pacote enviado com seq={seq_num}, aguardando ACK...")
 
             ack_recebido.clear()
             ack_recebido.wait(timeout=TIMEOUT)
 
             if ack_recebido.is_set():
+                print(f"[CLIENTE] ACK recebido para seq={seq_num}.")
                 seq_num = 1 - seq_num  # alterna entre 0 e 1
                 fragmentos_recebidos.append(fragmento)  # Adiciona o fragmento à lista de fragmentos recebidos
                 salvar_mensagem_como_arquivo(f"{nome_usuario}: {fragmento}")
