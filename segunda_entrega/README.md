@@ -140,7 +140,8 @@ Os logs detalhados ajudam a entender o funcionamento do protocolo RDT 3.0. Exemp
 ---
 
 ### Formato dos Pacotes
-```python
+
+
 # Mensagem:
 f"RDT|{seq_num}|{checksum}|{mensagem}"
 
@@ -189,7 +190,7 @@ f"ACK|{seq_num}|{checksum_ack}"
 ## 🎥 Vídeo do funcionamento do progama realizado pela equipe:
 
   <p align="center">
-     Link de acesso:
+     Link de acesso: (https://youtu.be/c_axYn-K-dI?feature=shared)
   </p>
 
   ## 📌 Licença

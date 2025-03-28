@@ -5,6 +5,13 @@
 
 Este projeto tem como objetivo a implementação de um sistema de chat com transferência confiável utilizando o protocolo RDT 3.0 sobre UDP, garantindo entrega ordenada e sem erros mesmo em condições de rede instável, aplicando conceitos vistos em sala de aula sobre os conceitos da disciplina IF975- Redes de computadores
 
+## 🎥 Vídeo do funcionamento do progama realizado pela equipe:
+
+  <p align="center">
+     Link de acesso: (https://youtu.be/c_axYn-K-dI?feature=shared)
+  </p>
+
+
 ## 1) Membros da `Equipe 1` 👥:
 <br>
 
